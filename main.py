@@ -34,22 +34,20 @@ def getInterface(interface):
         return secondaryInterface['gateway']
 
 # Function to create static routes for given network and region
-def addRoutes(network, region=None):
-    print(f"\nNetwork chosen: {network}")
-    if region:
-        print(f"Region chosen: {region}")
-
-    ips = loadIPs(network, region)
+def addRoutes(network):
+    ips = loadIPs(network)
     secondaryGateway = getInterface(interface="secondary")
 
     print("Routes updating...")
-    for ip in ips:
-        os.system(f'cmd /c "route -p ADD {ip} mask 255.255.255.255 {secondaryGateway}"')
+    for subnetMask in ips:
+        for ip in ips[subnetMask]:
+            os.system(f'cmd /c "route -p ADD {ip} mask {subnetMask} {secondaryGateway}"')
     menu()
 
 # Function to remove all created static routes
 def removeRoutes():
     ips = loadIPs()
+
     print("Routes being removed...")
     for block in ips:
         for ip in block:
@@ -74,29 +72,11 @@ def menu():
 
         choice = input ("Please make a choice: ")
 
-        if choice == "valve":
-            valveRegionMenu()
-        elif choice == "riot":
-            addRoutes('riot')
-        elif choice == "bnet":
-            addRoutes('battlenet')
-        elif choice == "reset":
-            removeRoutes()
-        else:
-            menu()
-
-# Choose a region for valve network
-def valveRegionMenu():
-    regions = ["africa (afr)", "asia (sea)", "australia (aus)", "europe (eu)", "north_america (na)", "south_america (sa)"]
-    print("\nChoose a region:")
-    for region in regions:
-        print(region)
-
-    choice = input ("\nPlease make a choice: ")
-    
-    for region in regions:
-        if choice in region:
-            addRoutes('valve', choice)      
+        if choice == "valve": addRoutes('valve')
+        elif choice == "riot": addRoutes('riot')
+        elif choice == "bnet": addRoutes('battlenet')
+        elif choice == "reset": removeRoutes()
+        else: menu()
 
 # Request UAC
 def is_admin():

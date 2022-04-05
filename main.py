@@ -1,7 +1,7 @@
 import netifaces, os, ctypes, sys, subprocess
 from scapy.arch.windows import *
 from time import sleep
-from setupIP import loadIPs
+from setupIP import loadIPs, updateIPs
 
 # Get and return secondary interface gateway
 def getInterface(interface):
@@ -77,16 +77,18 @@ def menu():
         print("A secondary interface MUST be active for this tool to work.\n\n")
 
         print("Choose a game to divert:")
-        print("Type valve for all Valve games.")
-        print("Type riot for all Riot games. (Not implemented yet)")
-        print("Type bnet for all Battle-Net Games.")
-        print("Type reset to delete all diversions. (This may take a few moments)")
+        print("valve for all Valve games.")
+        print("riot for all Riot games. (Not implemented yet)")
+        print("bnet for all Battle-Net Games.")
+        print("update to fetch the latest IP addresses.")
+        print("Type reset to delete all diversions.")
 
         choice = input ("Please make a choice: ")
 
         if choice == "valve": setup('valve')
         elif choice == "riot": setup('riot')
         elif choice == "bnet": setup('battlenet')
+        elif choice == "update": updateIPs()
         elif choice == "reset": reset()
         else: menu()
 

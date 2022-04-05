@@ -18,4 +18,6 @@ This would lead to all traffic (YouTube, downloads, updates) go through the alre
 - A secondary interface MUST be active (connected) when running this tool.
 - IPv6 connectivity will be disabled on the secondary interface to ensure no traffic leakage.
 - Make sure to confirm that this tool is working by using task manager and viewing interface network usage.
+
 - Source build: `pyinstaller --onefile --add-data "setupIP.py;." --add-data "ips.json;." --name game2interface --icon=icon.ico main.py`
+- IP List: `https://pastebin.com/raw/mpZdJ12n`

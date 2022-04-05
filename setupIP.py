@@ -21,9 +21,7 @@ def loadIPs(network=None):
         return allIPs
 
 def updateIPs():
-    url = 'https://raw.githubusercontent.com/AliMickey/game2interface/main/ips.json'
+    url = 'https://pastebin.com/raw/mpZdJ12n'
     ipFile = requests.get(url)
     with open(resource_path('ips.json'), 'wb') as f:
         f.write(ipFile.content)
-
-updateIPs()

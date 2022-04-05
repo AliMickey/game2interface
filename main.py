@@ -1,4 +1,4 @@
-import netifaces, os, ctypes, sys
+import netifaces, os, ctypes, sys, subprocess
 from scapy.arch.windows import *
 from time import sleep
 from setupIP import loadIPs
@@ -9,6 +9,7 @@ def getInterface(interface):
     interfaceDetails = get_windows_if_list()
     interfaces = []
 
+    # Keep only relevant interfaces
     for interface in interfaceDetails:
         if len(interface['ips']) > 0:
             if not any(n in interface['name'] for n in ['Loopback', 'Local Area Connection']):
@@ -27,27 +28,38 @@ def getInterface(interface):
         print("\nError: A secondary interface was not detected.")
         sleep(2)
         menu()
-
+    
     if interface == "primary":
-        return primaryInterface['gateway']
+        return primaryInterface
     else:
-        return secondaryInterface['gateway']
+        return secondaryInterface
 
-# Function to create static routes for given network and region
-def addRoutes(network):
+# Function to setup all necessary changes
+def setup(network):
     ips = loadIPs(network)
-    secondaryGateway = getInterface(interface="secondary")
+    secondaryInterface = getInterface(interface="secondary")
 
-    print("Routes updating...")
+    # Disable ipv6 on the secondary interface
+    print("IPv6 being disabled...")
+    subprocess.run(["powershell", "-Command", f"Disable-NetAdapterBinding -Name '{secondaryInterface['name']}' -ComponentID ms_tcpip6"])
+
+    # Create a new static route for each ip within each subnet mask
+    print("Routes being updated...")
     for subnetMask in ips:
         for ip in ips[subnetMask]:
-            os.system(f'cmd /c "route -p ADD {ip} mask {subnetMask} {secondaryGateway}"')
+            os.system(f'cmd /c "route -p ADD {ip} mask {subnetMask} {secondaryInterface["gateway"]}"')
     menu()
 
-# Function to remove all created static routes
-def removeRoutes():
+# Function to revert all changes made by the app
+def reset():
     ips = loadIPs()
-
+    secondaryInterface = getInterface(interface="secondary")
+    
+    # Enable ipv6 on the secondary interface
+    print("IPv6 being enabled...")
+    subprocess.run(["powershell", "-Command", f"Enable-NetAdapterBinding -Name '{secondaryInterface['name']}' -ComponentID ms_tcpip6"])
+    
+    # Delete all static routes
     print("Routes being removed...")
     for block in ips:
         for ip in block:
@@ -72,10 +84,10 @@ def menu():
 
         choice = input ("Please make a choice: ")
 
-        if choice == "valve": addRoutes('valve')
-        elif choice == "riot": addRoutes('riot')
-        elif choice == "bnet": addRoutes('battlenet')
-        elif choice == "reset": removeRoutes()
+        if choice == "valve": setup('valve')
+        elif choice == "riot": setup('riot')
+        elif choice == "bnet": setup('battlenet')
+        elif choice == "reset": reset()
         else: menu()
 
 # Request UAC

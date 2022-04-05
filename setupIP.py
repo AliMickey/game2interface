@@ -1,4 +1,5 @@
 import json, sys, os, requests
+from turtle import update
 
 # Get absolute path to resource, works for dev and for PyInstaller
 def resource_path(relative_path):
@@ -24,3 +25,5 @@ def updateIPs():
     ipFile = requests.get(url)
     with open(resource_path('ips.json'), 'wb') as f:
         f.write(ipFile.content)
+
+updateIPs()

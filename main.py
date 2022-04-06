@@ -64,8 +64,8 @@ def reset():
     for block in ips:
         for ip in block:
             os.system(f'cmd /c "route delete {ip}"')
-    menu()
 
+implementedNetworks = {'valve': 'Valve', 'apex': 'Apex Legends', 'riot': 'Riot Games', 'bnet': 'Battle-Net'}
 # Main menu for network selection
 def menu():
     choice = '0'
@@ -77,19 +77,22 @@ def menu():
         print("A secondary interface MUST be active for this tool to work.\n\n")
 
         print("Choose a game to divert:")
-        print("valve for all Valve games.")
-        print("riot for all Riot games. (Not implemented yet)")
-        print("bnet for all Battle-Net Games.")
-        print("update to fetch the latest IP addresses.")
+        for alias, network in implementedNetworks.items():
+            print(f"Type {alias} for {network}.")
+
+        print("\nType update to fetch the latest IP addresses.")
         print("Type reset to delete all diversions.")
 
-        choice = input ("Please make a choice: ")
+        choice = input ("\nPlease make a choice: ")
 
-        if choice == "valve": setup('valve')
-        elif choice == "riot": setup('riot')
-        elif choice == "bnet": setup('battlenet')
-        elif choice == "update": updateIPs()
-        elif choice == "reset": reset()
+        if choice in implementedNetworks:
+            setup(choice)
+        elif choice == "update":
+            updateIPs()
+            menu()
+        elif choice == "reset": 
+            reset()
+            menu()
         else: menu()
 
 # Request UAC

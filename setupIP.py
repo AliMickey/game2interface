@@ -11,8 +11,8 @@ def loadIPs(network=None):
     with open(resource_path('ips.json'), 'r') as f:
         ips = json.load(f)
 
-    if network == 'valve': return ips['valve']
-    elif network == 'bnet': return ips['battlenet']
+    if network:
+        return ips[network]
     else: 
         allIPs = []
         for network in ips:

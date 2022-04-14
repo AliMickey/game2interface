@@ -15,24 +15,38 @@ def getInterface(interface):
             if not any(n in interface['name'] for n in ['Loopback', 'Local Area Connection']):
                 interfaces.append({'name': interface['name'], 'guid': interface['guid'], 'ips': interface['ips']})
 
-    for interface in interfaces:
-        for x in interfaceGateways[2]:
-            if interface['guid'] == x[1]:
-                interface['gateway'] = x[0]
-                break
-
-    if len(interfaces) >= 2:
-        primaryInterface = interfaces[0]
-        secondaryInterface = interfaces[1]
-    else:
+    # If only one interface is found (primary only)
+    if len(interfaces) <= 1:
         print("\nError: A secondary interface was not detected.")
         sleep(2)
         menu()
+
+    # If there is a secondary interface
+    os.system("cls")
+    print("\nChoose your secondary interface:\n")
+    count = 0
+    for interface in interfaces[1:]: # Omit the primary interface
+        print(f"{count}) {interface['name']}")
+        count += 1
+    
+    while True:
+        # Increase input by 1 to account for excluded primary interface
+        chosenInterfaceIndex = int(input("\nPlease make a choice: ")) + 1
+        if chosenInterfaceIndex > count:
+            print("Invalid input: ")
+        else:
+            break
+
+    # Get the gateway IP for the selected interface
+    for x in interfaceGateways[2]:
+        if interfaces[chosenInterfaceIndex]['guid'] == x[1]:
+            interfaces[chosenInterfaceIndex]['gateway'] = x[0]
+            break   
     
     if interface == "primary":
-        return primaryInterface
+        return interfaces[0]
     else:
-        return secondaryInterface
+        return interfaces[chosenInterfaceIndex]
 
 # Function to setup all necessary changes
 def setup(network):
@@ -74,16 +88,15 @@ def menu():
         print("Welcome to game2interface. An app to route video game traffic through a secondary stable interface.")
         print("No guarantees are given, continually monitor to ensure that you do not eat up your mobile bandwidth.")
         print("For more info: https://github.com/AliMickey/game2interface\n")
-        print("A secondary interface MUST be active for this tool to work.\n\n")
 
-        print("Choose a game to divert:")
+        print("Choose a game network to divert:")
         for alias, network in implementedNetworks.items():
             print(f"Type {alias} for {network}.")
 
         print("\nType update to fetch the latest IP addresses.")
         print("Type reset to delete all diversions.")
 
-        choice = input ("\nPlease make a choice: ")
+        choice = input("\nPlease make a choice: ")
 
         if choice in implementedNetworks:
             setup(choice)

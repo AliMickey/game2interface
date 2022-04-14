@@ -20,4 +20,4 @@ This would lead to all traffic (YouTube, downloads, updates) go through the alre
 - Make sure to confirm that this tool is working by using task manager and viewing interface network usage.
 
 - Source build: `pyinstaller --onefile --add-data "setupIP.py;." --add-data "ips.json;." --name game2interface --icon=icon.ico main.py`
-- IP List: `https://pastebin.com/raw/mpZdJ12n`
+- IP List: `https://pastebin.com/mpZdJ12n`

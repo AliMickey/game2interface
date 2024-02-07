@@ -12,7 +12,7 @@ def getInterface(interface):
     # Keep only relevant interfaces
     for interface in interfaceDetails:
         if len(interface['ips']) > 0:
-            if not any(n in interface['name'] for n in ['Loopback', 'Local Area Connection']):
+            if not any(n in interface['name'] for n in ['Loopback', 'Local Area Connection', 'vEthernet']):
                 interfaces.append({'name': interface['name'], 'guid': interface['guid'], 'ips': interface['ips']})
 
     # If only one interface is found (primary only)
